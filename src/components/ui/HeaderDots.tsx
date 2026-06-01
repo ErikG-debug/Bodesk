@@ -38,8 +38,9 @@ export function HeaderDots() {
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
-        {/* Termisk gradient: rund blå blob i pixelkoordinater → fadar till transparent */}
-        <radialGradient id="thermal" gradientUnits="userSpaceOnUse" cx="1267" cy="36" r="340">
+        {/* Elliptisk gradient: bredare horisontellt, lite flatare vertikalt */}
+        <radialGradient id="thermal" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1"
+          gradientTransform="translate(1240 36) scale(430 220)">
           <stop offset="0%"   stopColor="#0b4e87" stopOpacity="1"   />
           <stop offset="28%"  stopColor="#1a7bc4" stopOpacity="1"   />
           <stop offset="58%"  stopColor="#5ab0de" stopOpacity="0.65"/>
