@@ -59,11 +59,7 @@ export function HeaderDots() {
           />
           <feColorMatrix type="saturate" values="0" in="noise" result="mono" />
           <feBlend in="SourceGraphic" in2="mono" mode="overlay" result="blended" />
-          <feComponentTransfer in="blended">
-            <feFuncR type="linear" slope="1.1" intercept="-0.05" />
-            <feFuncG type="linear" slope="1.1" intercept="-0.05" />
-            <feFuncB type="linear" slope="1.15" intercept="-0.05" />
-          </feComponentTransfer>
+          <feComposite in="blended" in2="SourceGraphic" operator="in" />
         </filter>
 
         {/* Logo clip-path */}
