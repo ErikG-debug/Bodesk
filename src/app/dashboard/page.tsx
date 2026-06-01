@@ -1,23 +1,40 @@
 import { prisma } from "@/lib/prisma";
 import { CaseRow } from "@/components/cases/CaseRow";
+import type { CaseStatus } from "@prisma/client";
 
 const DEMO_COMPANY_ID = process.env.DEMO_COMPANY_ID ?? "";
 
+const STATUS_TABS: { label: string; value: CaseStatus | "ALL" }[] = [
+  { label: "Alla", value: "ALL" },
+  { label: "Brådskande", value: "ESCALATED" },
+  { label: "Inväntar svar", value: "WAITING_FOR_RESIDENT" },
+  { label: "Redo för granskning", value: "READY_FOR_REVIEW" },
+  { label: "Pågående", value: "IN_PROGRESS" },
+  { label: "Samlar info", value: "COLLECTING_INFORMATION" },
+];
+
 interface PageProps {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ filter?: string }>;
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
-  const { category } = await searchParams;
-  const activeCategory = category ?? null;
+  const { filter } = await searchParams;
+  const activeFilter = filter ?? null;
 
-  const [cases, categories, categoryCounts] = await Promise.all([
+  // Avgör om aktiv flik är status eller kategori-ID
+  const knownStatuses = STATUS_TABS.map((t) => t.value as string);
+  const isStatusFilter = !activeFilter || knownStatuses.includes(activeFilter);
+  const activeStatus = isStatusFilter && activeFilter !== "ALL" ? (activeFilter as CaseStatus) : null;
+  const activeCategoryId = !isStatusFilter ? activeFilter : null;
+
+  const [cases, categories, statusCounts, categoryCounts] = await Promise.all([
     prisma.case.findMany({
       where: {
         ...(DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {}),
-        ...(activeCategory ? { categoryId: activeCategory } : {}),
+        ...(activeStatus ? { status: activeStatus } : {}),
+        ...(activeCategoryId ? { categoryId: activeCategoryId } : {}),
       },
-      orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+      orderBy: [{ updatedAt: "desc" }],
       include: {
         category: { select: { name: true } },
         property: { select: { name: true } },
@@ -30,16 +47,24 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       orderBy: { name: "asc" },
     }),
     prisma.case.groupBy({
+      by: ["status"],
+      _count: { status: true },
+      where: DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {},
+    }),
+    prisma.case.groupBy({
       by: ["categoryId"],
       _count: { categoryId: true },
       where: DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {},
     }),
   ]);
 
-  const countMap = Object.fromEntries(
-    categoryCounts.map((c) => [c.categoryId ?? "__none__", c._count.categoryId])
+  const statusCountMap = Object.fromEntries(
+    statusCounts.map((c) => [c.status, c._count.status])
   );
-  const totalCount = categoryCounts.reduce((sum, c) => sum + c._count.categoryId, 0);
+  const categoryCountMap = Object.fromEntries(
+    categoryCounts.map((c) => [c.categoryId ?? "", c._count.categoryId])
+  );
+  const totalCount = statusCounts.reduce((sum, c) => sum + c._count.status, 0);
 
   return (
     <div>
@@ -48,37 +73,27 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         <span className="text-sm text-gray-500">{cases.length} ärenden</span>
       </div>
 
-      {/* Kategoriflikar */}
+      {/* Flikar */}
       <div className="mb-4 flex gap-1 overflow-x-auto border-b border-gray-200 pb-px">
-        <a
-          href="/dashboard"
-          className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition ${
-            !activeCategory
-              ? "border-gray-900 text-gray-900"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Alla
-          {totalCount > 0 && (
-            <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
-              {totalCount}
-            </span>
-          )}
-        </a>
-        {categories.map((cat) => {
-          const count = countMap[cat.id] ?? 0;
-          const isActive = activeCategory === cat.id;
+        {STATUS_TABS.map((tab) => {
+          const count =
+            tab.value === "ALL"
+              ? totalCount
+              : (statusCountMap[tab.value as CaseStatus] ?? 0);
+          const isActive =
+            tab.value === "ALL" ? !activeFilter || activeFilter === "ALL" : activeFilter === tab.value;
+
           return (
             <a
-              key={cat.id}
-              href={`/dashboard?category=${cat.id}`}
+              key={tab.value}
+              href={tab.value === "ALL" ? "/dashboard" : `/dashboard?filter=${tab.value}`}
               className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition ${
                 isActive
                   ? "border-gray-900 text-gray-900"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              {cat.name}
+              {tab.label}
               {count > 0 && (
                 <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
                   {count}
@@ -87,6 +102,35 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             </a>
           );
         })}
+
+        {/* Kategoriflikar — visas om kategorier finns */}
+        {categories.length > 0 && (
+          <>
+            <div className="mx-2 my-2 w-px bg-gray-200" />
+            {categories.map((cat) => {
+              const count = categoryCountMap[cat.id] ?? 0;
+              const isActive = activeFilter === cat.id;
+              return (
+                <a
+                  key={cat.id}
+                  href={`/dashboard?filter=${cat.id}`}
+                  className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition ${
+                    isActive
+                      ? "border-gray-900 text-gray-900"
+                      : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  {cat.name}
+                  {count > 0 && (
+                    <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                      {count}
+                    </span>
+                  )}
+                </a>
+              );
+            })}
+          </>
+        )}
       </div>
 
       {/* Ärendelista */}
