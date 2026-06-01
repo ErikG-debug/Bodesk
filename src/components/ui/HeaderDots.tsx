@@ -1,46 +1,101 @@
+function seededRandom(seed: number) {
+  let s = seed | 0;
+  return () => {
+    s = Math.imul(s, 1664525) + 1013904223 | 0;
+    return (s >>> 0) / 0x100000000;
+  };
+}
+
+function generateDots(
+  W: number,
+  H: number,
+  focalX: number,
+  focalY: number,
+  sigma: number,
+  seed = 42
+) {
+  const rand = seededRandom(seed);
+  const step = 1.0;
+  const dots: { x: number; y: number }[] = [];
+
+  for (let gx = 0; gx <= W; gx += step) {
+    for (let gy = 0; gy <= H; gy += step) {
+      const dx = gx - focalX;
+      const dy = gy - focalY;
+      const prob = Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
+      if (rand() < prob) {
+        dots.push({
+          x: Math.round((gx + (rand() - 0.5) * 0.4) * 10) / 10,
+          y: Math.round((gy + (rand() - 0.5) * 0.4) * 10) / 10,
+        });
+      }
+    }
+  }
+  return dots;
+}
+
+function generateLogoDots(x0: number, y0: number, x1: number, y1: number) {
+  const rand = seededRandom(777);
+  const step = 2.2;
+  const dots: { x: number; y: number }[] = [];
+  for (let gx = x0; gx <= x1; gx += step) {
+    for (let gy = y0; gy <= y1; gy += step) {
+      dots.push({
+        x: Math.round((gx + (rand() - 0.5) * step * 0.35) * 10) / 10,
+        y: Math.round((gy + (rand() - 0.5) * step * 0.35) * 10) / 10,
+      });
+    }
+  }
+  return dots;
+}
+
+const W = 1440;
+const H = 72;
+
+const NAV_DOTS = generateDots(W, H, W * 0.88, H * 0.5, 280);
+const LOGO_DOTS = generateLogoDots(100, 20, 260, 55);
+
 export function HeaderDots() {
   return (
-    <svg
-      aria-hidden
-      className="pointer-events-none absolute inset-0 h-full w-full"
-      viewBox="0 0 1440 72"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      <defs>
-        {/* Mikroprick-pattern: 0.1px radius, 0.55px spacing */}
-        <pattern id="pd" x="0" y="0" width="1.5" height="1.5" patternUnits="userSpaceOnUse">
-          <circle cx="0.75" cy="0.75" r="0.6" fill="#3b82f6" />
-        </pattern>
+    <>
+      {/* Logo: prickar klippta till textform */}
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMinYMid meet"
+      >
+        <defs>
+          <clipPath id="propdesk-clip">
+            <text
+              x="104"
+              y="46"
+              fontSize="21"
+              fontWeight="700"
+              fontFamily="ui-sans-serif, system-ui, sans-serif"
+            >
+              PropDesk
+            </text>
+          </clipPath>
+        </defs>
+        <g clipPath="url(#propdesk-clip)">
+          {LOGO_DOTS.map((d, i) => (
+            <circle key={i} cx={d.x} cy={d.y} r={0.9} fill="#3b82f6" />
+          ))}
+        </g>
+      </svg>
 
-        {/* Nav-mask: tät mitt (88%, 50%), tonar ut mot kanterna */}
-        <radialGradient id="nav-grd" cx="88%" cy="50%" r="32%" gradientUnits="objectBoundingBox">
-          <stop offset="0%" stopColor="white" stopOpacity="1" />
-          <stop offset="45%" stopColor="white" stopOpacity="0.7" />
-          <stop offset="100%" stopColor="white" stopOpacity="0" />
-        </radialGradient>
-        <mask id="nav-m">
-          <rect width="1440" height="72" fill="url(#nav-grd)" />
-        </mask>
-
-        {/* Logo-clip: prickar beskärs till textform */}
-        <clipPath id="logo-cp">
-          <text
-            x="104"
-            y="46"
-            fontSize="21"
-            fontWeight="700"
-            fontFamily="ui-sans-serif, system-ui, sans-serif"
-          >
-            PropDesk
-          </text>
-        </clipPath>
-      </defs>
-
-      {/* Nav-prickar med gradient-densitet */}
-      <rect width="1440" height="72" fill="url(#pd)" mask="url(#nav-m)" />
-
-      {/* Logo-prickar klippta till textform */}
-      <rect width="1440" height="72" fill="url(#pd)" clipPath="url(#logo-cp)" />
-    </svg>
+      {/* Nav-prickar: tät kluster bakom länkarna */}
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMaxYMid slice"
+      >
+        {NAV_DOTS.map((d, i) => (
+          <circle key={i} cx={d.x} cy={d.y} r={0.6} fill="#3b82f6" />
+        ))}
+      </svg>
+    </>
   );
 }
