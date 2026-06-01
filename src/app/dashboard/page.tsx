@@ -10,7 +10,7 @@ const STATUS_TABS: { label: string; value: CaseStatus | "ALL" }[] = [
   { label: "Inväntar svar", value: "WAITING_FOR_RESIDENT" },
   { label: "Redo för granskning", value: "READY_FOR_REVIEW" },
   { label: "Pågående", value: "IN_PROGRESS" },
-  { label: "Samlar info", value: "COLLECTING_INFORMATION" },
+  { label: "Avslutade", value: "CLOSED" },
 ];
 
 interface PageProps {

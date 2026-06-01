@@ -9,6 +9,7 @@ const SKIP_AI = process.env.SKIP_AI === "true";
 
 const WAITING_TIMEOUT_HOURS = 48;
 const ARCHIVE_TIMEOUT_DAYS = 7;
+const GDPR_DELETE_DAYS = 90;
 
 export async function processInboundEmail(email: InboundEmail): Promise<void> {
   // Försök matcha på To-adress, annars ta första bolaget (MVP med ett bolag)
@@ -224,6 +225,15 @@ export async function checkTimeouts(): Promise<void> {
   // Ärenden som väntat >48h men <7 dagar → håll i WAITING (redan satt)
   // Kan användas för att skicka påminnelse i framtida version
   void waitingCutoff;
+
+  // GDPR: radera avslutade och arkiverade ärenden efter 90 dagar
+  const gdprCutoff = new Date(Date.now() - GDPR_DELETE_DAYS * 24 * 60 * 60 * 1000);
+  await prisma.case.deleteMany({
+    where: {
+      status: { in: ["CLOSED", "ARCHIVED"] },
+      updatedAt: { lt: gdprCutoff },
+    },
+  });
 }
 
 function extractName(fromEmail: string): string {
