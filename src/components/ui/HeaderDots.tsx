@@ -38,13 +38,13 @@ export function HeaderDots() {
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
-        {/* Termisk gradient: koncentrerad blå kärna → skarpt till vitt */}
-        <radialGradient id="thermal" cx="88%" cy="50%" r="52%" gradientUnits="objectBoundingBox">
-          <stop offset="0%"   stopColor="#0c5490" />
-          <stop offset="22%"  stopColor="#1a7bc4" />
-          <stop offset="48%"  stopColor="#8ac8e8" />
-          <stop offset="72%"  stopColor="#ddf0fb" />
-          <stop offset="100%" stopColor="#ffffff" />
+        {/* Termisk gradient: rund blå blob i pixelkoordinater → fadar till transparent */}
+        <radialGradient id="thermal" gradientUnits="userSpaceOnUse" cx="1267" cy="36" r="340">
+          <stop offset="0%"   stopColor="#0b4e87" stopOpacity="1"   />
+          <stop offset="28%"  stopColor="#1a7bc4" stopOpacity="1"   />
+          <stop offset="58%"  stopColor="#5ab0de" stopOpacity="0.65"/>
+          <stop offset="80%"  stopColor="#1a6ba8" stopOpacity="0.15"/>
+          <stop offset="100%" stopColor="#1a6ba8" stopOpacity="0"   />
         </radialGradient>
 
         {/* Sensor grain / termisk brus-filter */}
