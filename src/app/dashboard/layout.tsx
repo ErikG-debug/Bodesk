@@ -8,11 +8,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <header className="relative z-10 overflow-hidden border-b border-gray-200 bg-white">
         <HeaderDots />
         <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <Link href="/dashboard">
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-lg font-bold text-transparent">
-              PropDesk
-            </span>
-          </Link>
+          <Link href="/dashboard" aria-label="PropDesk" className="block h-7 w-32" />
           <nav className="flex gap-6 text-sm font-medium text-white drop-shadow">
             <Link href="/dashboard" className="transition hover:text-blue-100">
               Ärenden
