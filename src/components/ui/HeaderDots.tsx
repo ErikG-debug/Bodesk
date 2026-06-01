@@ -6,31 +6,28 @@ function seededRandom(seed: number) {
   };
 }
 
-function generateDots(
-  W: number,
-  H: number,
-  count: number,
-  focalX: number,
-  focalY: number,
-  sigma: number
-) {
-  const rand = seededRandom(7331);
+function generateDots(W: number, H: number, focalX: number, focalY: number, sigma: number) {
+  const rand = seededRandom(42);
+  const step = 4;
   const dots: { x: number; y: number; r: number }[] = [];
-  let attempts = 0;
 
-  while (dots.length < count && attempts < count * 40) {
-    attempts++;
-    const x = rand() * W;
-    const y = rand() * H;
-    const dx = x - focalX;
-    const dy = y - focalY;
-    const prob = Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
+  for (let gx = 0; gx <= W; gx += step) {
+    for (let gy = 0; gy <= H; gy += step) {
+      const dx = gx - focalX;
+      const dy = gy - focalY;
+      const prob = Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
 
-    if (rand() < prob) {
-      // Prickar lite synligare ute i glesa kanten
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const r = dist > sigma ? 2 : 1.5;
-      dots.push({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, r });
+      if (rand() < prob) {
+        const x = gx + (rand() - 0.5) * step * 0.7;
+        const y = gy + (rand() - 0.5) * step * 0.7;
+        // Lite större prickar i glesa kanten så dom syns tydligare
+        const r = prob < 0.25 ? 2.5 : 2;
+        dots.push({
+          x: Math.round(x * 10) / 10,
+          y: Math.round(y * 10) / 10,
+          r,
+        });
+      }
     }
   }
 
@@ -39,8 +36,8 @@ function generateDots(
 
 const W = 1440;
 const H = 72;
-// Fokuspunkt uppe till höger
-const DOTS = generateDots(W, H, 900, W * 0.84, H * 0.15, 280);
+// Fokuspunkt: höger sida, mitten av headern
+const DOTS = generateDots(W, H, W * 0.88, H * 0.5, 220);
 
 export function HeaderDots() {
   return (

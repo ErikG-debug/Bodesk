@@ -13,11 +13,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               PropDesk
             </span>
           </Link>
-          <nav className="flex gap-6 text-sm text-gray-500">
-            <Link href="/dashboard" className="transition hover:text-blue-600">
+          <nav className="flex gap-6 text-sm font-medium text-white drop-shadow">
+            <Link href="/dashboard" className="transition hover:text-blue-100">
               Ärenden
             </Link>
-            <Link href="/dashboard/settings" className="transition hover:text-blue-600">
+            <Link href="/dashboard/settings" className="transition hover:text-blue-100">
               Inställningar
             </Link>
           </nav>
