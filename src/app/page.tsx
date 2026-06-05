@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "PropDesk – Ärendehantering för fastighetsbolag",
+  title: "Bodesk – Ärendehantering för fastighetsbolag",
   description:
-    "PropDesk hjälper fastighetsbolag hantera hyresgästärenden via e-post med AI-assisterad kommunikation och ett enkelt CRM för handläggare.",
+    "Bodesk hjälper fastighetsbolag hantera hyresgästärenden via e-post med AI-assisterad kommunikation och ett enkelt CRM för handläggare.",
 };
 
 export default function HomePage() {
@@ -13,7 +13,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-gray-100 px-6 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <span className="text-lg font-bold text-gray-900">PropDesk</span>
+          <span className="text-lg font-bold text-gray-900">Bodesk</span>
           <Link
             href="/login"
             className="rounded-lg bg-[#1a6ba8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#155a8f]"
@@ -29,7 +29,7 @@ export default function HomePage() {
           Ärendehantering för fastighetsbolag
         </h1>
         <p className="mb-8 max-w-xl text-lg text-gray-500">
-          Hyresgäster mailar er vanliga felanmälningsadress. PropDesk tar hand om
+          Hyresgäster mailar er vanliga felanmälningsadress. Bodesk tar hand om
           inkommande ärenden automatiskt — AI samlar in nödvändig information och
           handläggaren tar över när ärendet är klart för åtgärd.
         </p>
@@ -53,7 +53,7 @@ export default function HomePage() {
               <h3 className="mb-2 font-semibold text-gray-900">Inkommande mail</h3>
               <p className="text-sm text-gray-500">
                 Hyresgästen skickar felanmälan till er befintliga e-postadress.
-                PropDesk tar emot den automatiskt via Postmark.
+                Bodesk tar emot den automatiskt via Postmark.
               </p>
             </div>
             <div className="rounded-xl bg-white p-6 shadow-sm">
@@ -82,7 +82,7 @@ export default function HomePage() {
           Integritetspolicy
         </Link>
         {" · "}
-        <span>© {new Date().getFullYear()} PropDesk</span>
+        <span>© {new Date().getFullYear()} Bodesk</span>
       </footer>
     </main>
   );

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Integritetspolicy – PropDesk",
-  description: "Hur PropDesk hanterar personuppgifter och e-postdata.",
+  title: "Integritetspolicy – Bodesk",
+  description: "Hur Bodesk hanterar personuppgifter och e-postdata.",
 };
 
 export default function PrivacyPage() {
@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">Om tjänsten</h2>
         <p className="text-sm leading-relaxed text-gray-600">
-          PropDesk är ett ärendehanteringssystem för fastighetsbolag. Tjänsten tar emot
+          Bodesk är ett ärendehanteringssystem för fastighetsbolag. Tjänsten tar emot
           inkommande e-post från hyresgäster, bearbetar innehållet med hjälp av artificiell
           intelligens och skickar svar från fastighetsbolagets egna e-postadress via Gmail.
           Dashboarden ger fastighetspersonal tillgång till ärendehistorik och kommunikation.
@@ -36,12 +36,12 @@ export default function PrivacyPage() {
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">Hur vi använder Gmail</h2>
         <p className="text-sm leading-relaxed text-gray-600">
-          PropDesk ansluter till Gmail via Google OAuth 2.0 enbart i syfte att skicka
+          Bodesk ansluter till Gmail via Google OAuth 2.0 enbart i syfte att skicka
           e-postsvar från fastighetsbolagets befintliga e-postadress. Åtkomsten begränsas
           till scopet <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">gmail.send</code>.
           Vi läser, lagrar eller analyserar inte befintlig e-post i Gmail-kontot.
           OAuth-tokens lagras krypterat och används enbart för utgående e-post relaterad
-          till ärenden i PropDesk.
+          till ärenden i Bodesk.
         </p>
       </section>
 

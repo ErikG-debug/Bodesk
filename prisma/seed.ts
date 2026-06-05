@@ -9,24 +9,24 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   // Bolag
   const company = await prisma.company.upsert({
-    where: { intakeEmail: "felanmalan@propdesk.test" },
+    where: { intakeEmail: "felanmalan@bodesk.test" },
     update: {},
     create: {
       name: "Testbolaget AB",
-      intakeEmail: "felanmalan@propdesk.test",
+      intakeEmail: "felanmalan@bodesk.test",
     },
   });
 
   console.log(`Bolag: ${company.name} (${company.id})`);
 
   // Admin-användare
-  const passwordHash = await bcrypt.hash("propdesk123", 10);
+  const passwordHash = await bcrypt.hash("bodesk123", 10);
 
   const admin = await prisma.user.upsert({
-    where: { email: "admin@propdesk.test" },
+    where: { email: "admin@bodesk.test" },
     update: {},
     create: {
-      email: "admin@propdesk.test",
+      email: "admin@bodesk.test",
       name: "Admin",
       password: passwordHash,
       role: "ADMIN",
@@ -34,7 +34,7 @@ async function main() {
     },
   });
 
-  console.log(`Admin: ${admin.email} / lösenord: propdesk123`);
+  console.log(`Admin: ${admin.email} / lösenord: bodesk123`);
 
   // Exempelkategori med fält
   const category = await prisma.issueCategory.upsert({

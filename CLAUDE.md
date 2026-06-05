@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Vad detta är
 
-PropDesk är ett AI-drivet ärendehanteringssystem för fastighetsbolag. Hyresgäster mailar fastighetsskötarens vanliga supportinkorg. Mailhanteringen vidarebefordras automatiskt till plattformen. En AI (Claude) sköter inledande kommunikation med hyresgästen och samlar strukturerad information tills ärendet är komplett — sedan tar en mänsklig handläggare över via dashboardens CRM.
+Bodesk är ett AI-drivet ärendehanteringssystem för fastighetsbolag. Hyresgäster mailar fastighetsskötarens vanliga supportinkorg. Mailhanteringen vidarebefordras automatiskt till plattformen. En AI (Claude) sköter inledande kommunikation med hyresgästen och samlar strukturerad information tills ärendet är komplett — sedan tar en mänsklig handläggare över via dashboardens CRM.
 
 Hyresgäster interagerar aldrig med plattformens UI. Dashboarden är enbart för fastighetsbolagets personal.
 
