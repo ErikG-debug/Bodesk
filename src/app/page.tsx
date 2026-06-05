@@ -14,7 +14,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-gray-100 px-6 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <Image src="/logo.png" alt="BoDesk" width={140} height={40} className="h-10 w-auto" />
+          <Image src="/logo.png" alt="BoDesk" width={280} height={80} className="h-20 w-auto" />
           <Link
             href="/login"
             className="rounded-lg bg-[#1a6ba8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#155a8f]"
