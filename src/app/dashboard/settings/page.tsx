@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { GmailConnect } from "@/components/dashboard/GmailConnect";
 import { CategoryEditor } from "@/components/dashboard/CategoryEditor";
+import { RoutingCategoryEditor } from "@/components/dashboard/RoutingCategoryEditor";
 
 export default function SettingsPage() {
   return (
@@ -12,6 +13,8 @@ export default function SettingsPage() {
       </Suspense>
 
       <CategoryEditor />
+
+      <RoutingCategoryEditor />
     </div>
   );
 }

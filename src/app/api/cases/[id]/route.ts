@@ -44,10 +44,13 @@ export async function PATCH(req: NextRequest, { params }: Params): Promise<NextR
   }
 
   const allowedTransitions: Partial<Record<CaseStatus, CaseStatus[]>> = {
-    READY_FOR_REVIEW: ["IN_PROGRESS", "CLOSED"],
+    COLLECTING_INFORMATION: ["IN_PROGRESS", "CLOSED", "ESCALATED"],
+    WAITING_FOR_RESIDENT: ["IN_PROGRESS", "CLOSED", "ESCALATED"],
+    READY_FOR_REVIEW: ["IN_PROGRESS", "CLOSED", "ESCALATED"],
     ESCALATED: ["IN_PROGRESS", "CLOSED"],
     IN_PROGRESS: ["CLOSED"],
-    WAITING_FOR_RESIDENT: ["IN_PROGRESS", "CLOSED"],
+    CLOSED: ["IN_PROGRESS"],
+    ARCHIVED: ["IN_PROGRESS"],
   };
 
   if (body.status) {
