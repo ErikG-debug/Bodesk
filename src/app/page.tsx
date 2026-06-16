@@ -82,9 +82,9 @@ export default function HomePage() {
             </div>
             <div className="rounded-xl bg-white p-6 shadow-sm">
               <div className="mb-3 text-2xl">🤖</div>
-              <h3 className="mb-2 font-semibold text-gray-900">AI hanterar dialogen</h3>
+              <h3 className="mb-2 font-semibold text-gray-900">Bo hanterar dialogen</h3>
               <p className="text-sm text-gray-500">
-                BoDesk klassificerar ärendet, ställer följdfrågor och samlar
+                Bo klassificerar ärendet, ställer följdfrågor och samlar
                 in all information som handläggaren behöver.
               </p>
             </div>

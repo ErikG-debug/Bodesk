@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,10 +16,9 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    const form = new FormData(e.currentTarget);
     const result = await signIn("credentials", {
-      email: form.get("email"),
-      password: form.get("password"),
+      email,
+      password,
       redirect: false,
     });
 
@@ -44,10 +45,11 @@ export default function LoginPage() {
             </label>
             <input
               id="email"
-              name="email"
               type="email"
               required
               autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-[#1a6ba8] focus:ring-2 focus:ring-[#1a6ba8]/20"
             />
           </div>
@@ -58,10 +60,11 @@ export default function LoginPage() {
             </label>
             <input
               id="password"
-              name="password"
               type="password"
               required
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-[#1a6ba8] focus:ring-2 focus:ring-[#1a6ba8]/20"
             />
           </div>
