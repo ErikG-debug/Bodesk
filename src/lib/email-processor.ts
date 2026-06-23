@@ -19,7 +19,13 @@ export async function processInboundEmail(email: InboundEmail): Promise<void> {
   });
 
   if (!company) {
-    console.warn(`Inget bolag med intakeEmail ${email.to} hittades — ignorerar mail`);
+    company = await prisma.company.findFirst({
+      include: { categories: { include: { fields: { orderBy: { order: "asc" } } } } },
+    });
+  }
+
+  if (!company) {
+    console.warn(`Inget bolag hittades i databasen — ignorerar mail`);
     return;
   }
 
