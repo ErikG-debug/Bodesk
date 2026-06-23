@@ -262,22 +262,27 @@ export default function CaseDetailPage() {
     e.preventDefault();
     if (!reply.trim() || !caseData) return;
     setSending(true);
-    await new Promise((r) => setTimeout(r, 250));
-    setCaseData({
-      ...caseData,
-      messages: [
-        ...caseData.messages,
-        {
-          id: `local-${Date.now()}`,
-          fromResident: false,
-          body: reply.trim(),
-          sentAt: new Date().toISOString(),
-        },
-      ],
-      updatedAt: new Date().toISOString(),
-    });
-    setReply("");
-    setSending(false);
+    try {
+      const res = await fetch(`/api/cases/${caseId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: reply.trim() }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error ?? "Kunde inte skicka svaret.");
+        return;
+      }
+      const { message } = await res.json();
+      setCaseData({
+        ...caseData,
+        messages: [...caseData.messages, message],
+        updatedAt: new Date().toISOString(),
+      });
+      setReply("");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
