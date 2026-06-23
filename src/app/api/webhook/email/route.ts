@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { processInboundEmail } from "@/lib/email-processor";
 import type { InboundEmail } from "@/types";
 
+function extractEmailAddress(raw: string): string {
+  const match = raw.match(/<([^>]+)>/);
+  return (match ? match[1] : raw).toLowerCase().trim();
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const rawBody = await req.text();
 
@@ -24,7 +29,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const email: InboundEmail = {
     from: (payload.From as string) ?? "",
-    to: ((payload.To as string) ?? "").toLowerCase(),
+    to: extractEmailAddress((payload.To as string) ?? ""),
     subject: (payload.Subject as string) ?? "(inget ämne)",
     textBody: (payload.TextBody as string) ?? "",
     htmlBody: (payload.HtmlBody as string | undefined),
