@@ -32,6 +32,7 @@ model Company {
   id           String         @id @default(cuid())
   name         String
   intakeEmail  String         @unique // unik adress dit property manager forwarderar
+  signature    String?
   createdAt    DateTime       @default(now())
   users        User[]
   properties   Property[]

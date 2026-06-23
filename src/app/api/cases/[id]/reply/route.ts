@@ -16,16 +16,29 @@ export async function POST(req: NextRequest, { params }: Params): Promise<NextRe
     return NextResponse.json({ error: "Tomt meddelande" }, { status: 400 });
   }
 
-  const caseData = await prisma.case.findUnique({
-    where: { id },
-    include: { messages: { orderBy: { sentAt: "asc" } } },
-  });
+  const [caseData, company] = await Promise.all([
+    prisma.case.findUnique({
+      where: { id },
+      include: { messages: { orderBy: { sentAt: "asc" } } },
+    }),
+    prisma.company.findUnique({
+      where: { id: session.user.companyId },
+      select: { signature: true },
+    }),
+  ]);
 
   if (!caseData || caseData.companyId !== session.user.companyId) {
     return NextResponse.json({ error: "Ärende hittades inte" }, { status: 404 });
   }
 
+  const signature = company?.signature?.trim() ?? "";
+  const fullBody = signature ? `${body.trim()}\n\n${signature}` : body.trim();
+
   const lastMessage = caseData.messages.at(-1);
+  const allEmailIds = caseData.messages
+    .map((m) => m.emailId)
+    .filter(Boolean) as string[];
+
   const replySubject = caseData.subject.startsWith("Re:")
     ? caseData.subject
     : `Re: ${caseData.subject}`;
@@ -34,16 +47,16 @@ export async function POST(req: NextRequest, { params }: Params): Promise<NextRe
     companyId: caseData.companyId,
     to: caseData.residentEmail,
     subject: replySubject,
-    body: body.trim(),
+    body: fullBody,
     inReplyTo: lastMessage?.emailId ?? undefined,
-    references: lastMessage?.emailId ?? undefined,
+    references: allEmailIds.join(" "),
   });
 
   const message = await prisma.message.create({
     data: {
       caseId: id,
       fromResident: false,
-      body: body.trim(),
+      body: fullBody,
       emailId: sentMessageId,
     },
   });

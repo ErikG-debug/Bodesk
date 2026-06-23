@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { GmailConnect } from "@/components/dashboard/GmailConnect";
+import { SignatureEditor } from "@/components/dashboard/SignatureEditor";
 import { CategoryEditor } from "@/components/dashboard/CategoryEditor";
 import { ContractorsEditor } from "@/components/dashboard/ContractorsEditor";
 import { RoutingCategoryEditor } from "@/components/dashboard/RoutingCategoryEditor";
@@ -12,6 +13,8 @@ export default function SettingsPage() {
       <Suspense fallback={<div className="h-32 animate-pulse rounded-lg bg-gray-100" />}>
         <GmailConnect />
       </Suspense>
+
+      <SignatureEditor />
 
       <CategoryEditor />
 

@@ -109,6 +109,7 @@ export default function CaseDetailPage() {
 
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [signature, setSignature] = useState<string | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"resident" | "contractor">("resident");
 
@@ -144,6 +145,13 @@ export default function CaseDetailPage() {
   useEffect(() => {
     fetchCase();
   }, [fetchCase]);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => setSignature(d.signature ?? ""))
+      .catch(() => setSignature(""));
+  }, []);
 
   const isBooked = stages[caseId] === "booked";
   const isReallyClosed =
@@ -342,17 +350,24 @@ export default function CaseDetailPage() {
                 <label htmlFor="reply" className="mb-2 block text-sm font-medium text-gray-700">
                   Svara på ärendet
                 </label>
-                <textarea
-                  id="reply"
-                  value={reply}
-                  onChange={(e) => setReply(e.target.value)}
-                  rows={4}
-                  placeholder="Skriv ditt svar till hyresgästen…"
-                  className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-[#1a6ba8] focus:ring-2 focus:ring-[#1a6ba8]/20"
-                />
+                <div className="overflow-hidden rounded-lg border border-gray-300 focus-within:border-[#1a6ba8] focus-within:ring-2 focus-within:ring-[#1a6ba8]/20">
+                  <textarea
+                    id="reply"
+                    value={reply}
+                    onChange={(e) => setReply(e.target.value)}
+                    rows={4}
+                    placeholder="Skriv ditt svar till hyresgästen…"
+                    className="w-full resize-y px-3 py-2 text-sm outline-none"
+                  />
+                  {signature && (
+                    <div className="border-t border-dashed border-gray-200 px-3 py-2">
+                      <p className="whitespace-pre-wrap text-xs text-gray-400">{signature}</p>
+                    </div>
+                  )}
+                </div>
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-xs text-gray-400">
-                    Detta är ett manuellt fall — dina svar skickas direkt till hyresgästen.
+                    Signaturen läggs till automatiskt vid utskick.
                   </p>
                   <button
                     type="submit"
