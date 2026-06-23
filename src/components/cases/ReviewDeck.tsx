@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, User, MapPin, ChevronDown, Check } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  Check,
+  AlertTriangle,
+  User,
+  Mail,
+  MapPin,
+  Send,
+} from "lucide-react";
 import { useContractors } from "@/lib/contractors";
 import { useCaseAssignees, setCaseAssignee } from "@/lib/caseAssignees";
 import type { Urgency } from "@/lib/types";
@@ -45,21 +55,13 @@ export function ReviewDeck({ cases, onApprove, onManual }: Props) {
     if (index >= total && total > 0) setIndex(total - 1);
   }, [total, index]);
 
-  useEffect(() => {
-    setPickerOpen(false);
-  }, [safeIndex, total]);
+  useEffect(() => { setPickerOpen(false); }, [safeIndex, total]);
 
-  const next = () => {
+  const navigate = (d: 1 | -1) => {
     if (total <= 1) return;
-    setDir(-1);
+    setDir(d);
     setAnimKey((k) => k + 1);
-    setIndex((i) => (i + 1) % total);
-  };
-  const prev = () => {
-    if (total <= 1) return;
-    setDir(1);
-    setAnimKey((k) => k + 1);
-    setIndex((i) => (i - 1 + total) % total);
+    setIndex((i) => (i + d + total) % total);
   };
 
   const handleApprove = () => {
@@ -108,191 +110,212 @@ export function ReviewDeck({ cases, onApprove, onManual }: Props) {
     <div className="mx-auto w-full max-w-lg">
       <style>{`
         @keyframes deck-in-right {
-          0%   { transform: translateX(38%) rotate(2.5deg); opacity: 0; }
-          100% { transform: translateX(0)   rotate(0deg);   opacity: 1; }
+          0%   { transform: translateX(36%) rotate(2deg); opacity: 0; }
+          100% { transform: translateX(0)  rotate(0deg);  opacity: 1; }
         }
         @keyframes deck-in-left {
-          0%   { transform: translateX(-38%) rotate(-2.5deg); opacity: 0; }
-          100% { transform: translateX(0)    rotate(0deg);    opacity: 1; }
+          0%   { transform: translateX(-36%) rotate(-2deg); opacity: 0; }
+          100% { transform: translateX(0)    rotate(0deg);  opacity: 1; }
         }
       `}</style>
 
-      {/* Stack wrapper — ghost cards peeking behind */}
       <div className="relative pb-3">
+        {/* Ghost cards */}
         {total > 2 && (
-          <div
-            className="absolute inset-x-6 top-4 bottom-0 rounded-2xl border border-gray-200 bg-[#eef0f3]"
-            style={{ zIndex: 10 }}
-          />
+          <div className="absolute inset-x-6 top-4 bottom-0 rounded-2xl border border-gray-200 bg-[#eef0f3]" style={{ zIndex: 10 }} />
         )}
         {total > 1 && (
-          <div
-            className="absolute inset-x-3 top-2 bottom-0 rounded-2xl border border-gray-200 bg-[#f5f6f8]"
-            style={{ zIndex: 11 }}
-          />
+          <div className="absolute inset-x-3 top-2 bottom-0 rounded-2xl border border-gray-200 bg-[#f5f6f8]" style={{ zIndex: 11 }} />
         )}
 
         {/* Main card */}
         <div
           key={animKey}
-          className={`relative z-20 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${enterClass}`}
+          className={`relative z-20 overflow-hidden rounded-2xl bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08),0_12px_28px_rgba(0,0,0,0.07)] ${enterClass}`}
         >
+          {/* Top accent */}
           <div className="absolute inset-x-0 top-0 h-[3px] bg-[#1a6ba8]" />
 
           {/* ── Header ── */}
-          <div className="flex items-start justify-between gap-3 px-6 pt-6 pb-4 border-b border-gray-100">
+          <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-4">
             <div className="min-w-0 flex-1">
               {current.category && (
-                <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-[#1a6ba8]/70">
                   {current.category.name}
                 </p>
               )}
-              <h2 className="text-base font-semibold text-gray-900 leading-snug">
+              <h2 className="text-[17px] font-semibold leading-snug text-gray-900">
                 {current.subject}
               </h2>
             </div>
-            {total > 1 && (
-              <div className="flex shrink-0 items-center gap-0.5 pt-0.5">
-                <button
-                  type="button"
-                  onClick={prev}
-                  aria-label="Föregående"
-                  className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <span className="min-w-[32px] text-center text-xs font-medium tabular-nums text-gray-400">
-                  {safeIndex + 1}/{total}
-                </span>
-                <button
-                  type="button"
-                  onClick={next}
-                  aria-label="Nästa"
-                  className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            )}
+            <div className="flex shrink-0 items-center gap-0.5 pt-0.5">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                disabled={total <= 1}
+                aria-label="Föregående"
+                className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="min-w-[36px] text-center text-xs font-semibold tabular-nums text-gray-500">
+                {safeIndex + 1}/{total}
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate(1)}
+                disabled={total <= 1}
+                aria-label="Nästa"
+                className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
-          {/* ── Body ── */}
-          <div className="space-y-4 px-6 pt-5 pb-5">
-            {/* Problem description */}
-            <div>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#1a6ba8]">
-                Problembeskrivning till tekniker
+          {/* ── Info rows ── */}
+          <div className="border-t border-gray-100 px-6 py-4 space-y-0 divide-y divide-gray-50">
+            <InfoRow icon={<User className="h-4 w-4" />} label="Boende">
+              <span className="font-medium text-gray-900">
+                {current.residentName ?? <span className="italic text-gray-400">Ej angivet</span>}
+              </span>
+            </InfoRow>
+
+            <InfoRow icon={<Mail className="h-4 w-4" />} label="Kontakt">
+              <span className="text-gray-700">{current.residentEmail}</span>
+              {current.contactPhone && (
+                <span className="ml-2 text-gray-500">· {current.contactPhone}</span>
+              )}
+            </InfoRow>
+
+            <InfoRow icon={<MapPin className="h-4 w-4" />} label="Adress">
+              {current.property?.name ? (
+                <span className="text-gray-700">{current.property.name}</span>
+              ) : (
+                <span className="italic text-gray-400">Ej angivet</span>
+              )}
+            </InfoRow>
+
+            <InfoRow icon={<Send className="h-4 w-4" />} label="Skickas till">
+              {contractors.length === 0 ? (
+                <span className="italic text-gray-400">Lägg till servicepersonal i Inställningar</span>
+              ) : (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setPickerOpen((v) => !v)}
+                    className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white py-1 pl-2.5 pr-2 text-sm text-gray-800 transition hover:border-[#1a6ba8] hover:text-[#1a6ba8] focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/20"
+                  >
+                    {currentContractor ? (
+                      <>
+                        <span className="font-medium">{currentContractor.name}</span>
+                        <span className="text-xs text-gray-400">{currentContractor.role}</span>
+                      </>
+                    ) : (
+                      <span className="italic text-gray-400">Välj mottagare</span>
+                    )}
+                    <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-gray-400 transition-transform ${pickerOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {pickerOpen && (
+                    <>
+                      <button
+                        type="button"
+                        aria-hidden
+                        onClick={() => setPickerOpen(false)}
+                        className="fixed inset-0 z-30 cursor-default"
+                      />
+                      <div className="absolute left-0 top-full z-40 mt-1.5 w-64 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                        {contractors.map((c) => {
+                          const active = currentContractor?.id === c.id;
+                          return (
+                            <button
+                              type="button"
+                              key={c.id}
+                              onClick={() => {
+                                if (current) setCaseAssignee(current.id, c.id);
+                                setPickerOpen(false);
+                              }}
+                              className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition hover:bg-[#1a6ba8]/5 ${active ? "bg-[#1a6ba8]/5" : ""}`}
+                            >
+                              <span className="min-w-0 flex-1">
+                                <span className="block font-medium text-gray-900">{c.name}</span>
+                                <span className="block text-xs text-gray-500">{c.role}</span>
+                              </span>
+                              {active && <Check className="h-4 w-4 shrink-0 text-[#1a6ba8]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </InfoRow>
+          </div>
+
+          {/* ── AI Summary ── */}
+          <div className="px-6 pb-4">
+            <div className="rounded-xl border border-[#1a6ba8]/20 bg-[#1a6ba8]/[0.04] p-4">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#1a6ba8]">
+                AI-SAMMANFATTNING
               </p>
               <p className="text-sm leading-relaxed text-gray-700">{current.summary}</p>
             </div>
 
-            {/* Suggested technician */}
-            <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-                Bo föreslår
-              </p>
-              {contractors.length === 0 ? (
-                <p className="text-sm italic text-gray-400">
-                  Lägg till servicepersonal i Inställningar
-                </p>
-              ) : currentContractor ? (
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-medium text-gray-900">{currentContractor.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {currentContractor.role}
-                      {currentContractor.email && (
-                        <> · {currentContractor.email}</>
-                      )}
-                    </p>
-                  </div>
-                  <div className="relative shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setPickerOpen((v) => !v)}
-                      className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-600 transition hover:border-[#1a6ba8] hover:text-[#1a6ba8]"
-                    >
-                      Ändra
-                      <ChevronDown
-                        className={`h-3 w-3 transition-transform ${pickerOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {pickerOpen && (
-                      <>
-                        <button
-                          type="button"
-                          aria-hidden
-                          onClick={() => setPickerOpen(false)}
-                          className="fixed inset-0 z-30 cursor-default"
-                        />
-                        <div className="absolute right-0 top-full z-40 mt-1.5 w-60 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                          {contractors.map((c) => {
-                            const active = currentContractor?.id === c.id;
-                            return (
-                              <button
-                                type="button"
-                                key={c.id}
-                                onClick={() => {
-                                  if (current) setCaseAssignee(current.id, c.id);
-                                  setPickerOpen(false);
-                                }}
-                                className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition hover:bg-[#1a6ba8]/5 ${active ? "bg-[#1a6ba8]/5" : ""}`}
-                              >
-                                <span className="min-w-0 flex-1">
-                                  <span className="block font-medium text-gray-900">{c.name}</span>
-                                  <span className="block text-xs text-gray-500">{c.role}</span>
-                                </span>
-                                {active && <Check className="h-4 w-4 shrink-0 text-[#1a6ba8]" />}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400">Ingen tekniker matchad</p>
-              )}
-            </div>
-
-            {/* Resident & property */}
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
-              <span className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                {current.residentName ?? current.residentEmail}
-              </span>
-              {current.property?.name && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {current.property.name}
-                </span>
-              )}
-              <span className="ml-auto">
-                {new Date(current.reportedAt).toLocaleDateString("sv-SE")}
-              </span>
-            </div>
+            <p className="mt-3 text-xs text-gray-400">
+              Inrapporterat{" "}
+              {new Date(current.reportedAt).toLocaleString("sv-SE", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </p>
           </div>
 
           {/* ── Actions ── */}
-          <div className="flex gap-2 border-t border-gray-100 bg-gray-50/70 px-6 py-4">
+          <div className="flex gap-2 border-t border-gray-100 bg-gray-50/60 px-6 py-4">
             <button
               type="button"
               onClick={handleManual}
-              className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-500 transition hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 active:scale-[0.98]"
             >
-              Manuellt fall
+              <AlertTriangle className="h-4 w-4" />
+              MANUELLT
             </button>
             <button
               type="button"
               onClick={handleApprove}
-              className="flex-[2] rounded-lg bg-[#1a6ba8] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#155689] active:scale-[0.98]"
+              className="flex flex-[2] items-center justify-center rounded-xl bg-[#1a6ba8] px-4 py-3 text-sm font-bold tracking-wide text-white shadow-sm transition hover:bg-[#155689] active:scale-[0.98]"
             >
-              Godkänn tekniker
+              GODKÄNN
             </button>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function InfoRow({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-3 py-2.5">
+      <div className="flex w-[120px] shrink-0 items-center gap-2 text-gray-400">
+        {icon}
+        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+      </div>
+      <div className="min-w-0 flex-1 text-sm">{children}</div>
     </div>
   );
 }
