@@ -154,13 +154,39 @@ export function DashboardContent() {
     [cases],
   );
 
-  const handleApprove = (id: string) => {
+  const handleApprove = (id: string, contractorEmail?: string, contractorName?: string) => {
     setCaseStage(id, null);
     fetch(`/api/cases/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "IN_PROGRESS" }),
     }).catch(() => null);
+
+    if (contractorEmail) {
+      const rc = reviewCases.find((c) => c.id === id);
+      if (rc) {
+        const lines = [
+          `Hej${contractorName ? ` ${contractorName}` : ""},`,
+          "",
+          `Du har tilldelats ett nytt ärende: ${rc.subject}`,
+          "",
+          `Boende: ${rc.residentName ?? rc.residentEmail}`,
+          ...(rc.property?.name ? [`Fastighet: ${rc.property.name}`] : []),
+          "",
+          rc.summary,
+        ];
+        fetch(`/api/cases/${id}/forward`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: contractorEmail,
+            subject: `Nytt ärende: ${rc.subject}`,
+            message: lines.join("\n"),
+          }),
+        }).catch(() => null);
+      }
+    }
+
     setRawCases((prev) =>
       prev.map((c) => (c.id === id ? { ...c, status: "IN_PROGRESS" as CaseStatus } : c)),
     );

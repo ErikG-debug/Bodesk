@@ -32,7 +32,7 @@ export interface ReviewCase {
 
 interface Props {
   cases: ReviewCase[];
-  onApprove: (id: string) => void;
+  onApprove: (id: string, contractorEmail?: string, contractorName?: string) => void;
   onManual: (id: string) => void;
 }
 
@@ -68,7 +68,7 @@ export function ReviewDeck({ cases, onApprove, onManual }: Props) {
     if (!current) return;
     setDir(-1);
     setAnimKey((k) => k + 1);
-    onApprove(current.id);
+    onApprove(current.id, currentContractor?.email, currentContractor?.name);
   };
   const handleManual = () => {
     if (!current) return;

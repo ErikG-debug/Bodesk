@@ -184,10 +184,9 @@ export default function CaseDetailPage() {
     sendResidentReply();
   }
 
-  // Contractor tab: just marks as manual for now (real contractor messaging TBD)
   async function handleContractorSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!reply.trim()) return;
+    if (!reply.trim() || !selectedRouting) return;
     if (!isManual && !confirmStep) {
       setConfirmStep(true);
       return;
@@ -201,6 +200,16 @@ export default function CaseDetailPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "ESCALATED" }),
         });
+      }
+      const res = await fetch(`/api/cases/${caseId}/forward`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: selectedRouting.email, message: reply.trim() }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error ?? "Kunde inte skicka till servicepersonal.");
+        return;
       }
       setReply("");
       setConfirmStep(false);
@@ -238,9 +247,32 @@ export default function CaseDetailPage() {
     }
   }
 
-  function confirmForward() {
-    setForwardSent(true);
-    setTimeout(() => setForwardOpen(false), 1200);
+  async function confirmForward() {
+    if (!selectedRouting) return;
+    setForwardLoading(true);
+    setForwardError(null);
+    try {
+      const res = await fetch(`/api/cases/${caseId}/forward`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: selectedRouting.email,
+          subject: `Ärende vidarebefordrat: ${caseData?.subject ?? ""}`,
+          message: forwardSummary,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setForwardError(data.error ?? "Kunde inte skicka vidare.");
+        return;
+      }
+      setForwardSent(true);
+      setTimeout(() => setForwardOpen(false), 1500);
+    } catch (err) {
+      setForwardError(err instanceof Error ? err.message : "Okänt fel");
+    } finally {
+      setForwardLoading(false);
+    }
   }
 
   async function handleClose() {
@@ -340,6 +372,28 @@ export default function CaseDetailPage() {
             {/* Reply form (always shown when not closed) */}
             {!isClosed && (
               <form onSubmit={onSubmit} className="border-t border-gray-100 px-6 pt-4 pb-5 mt-4">
+                {/* Routing selector for contractor tab */}
+                {activeTab === "contractor" && (
+                  <div className="mb-3 flex items-center gap-2">
+                    <label htmlFor="contractor-routing" className="shrink-0 text-xs font-medium text-gray-500">
+                      Skickas till:
+                    </label>
+                    {routingCats.length === 0 ? (
+                      <span className="text-xs italic text-gray-400">Lägg till servicepersonal i Inställningar</span>
+                    ) : (
+                      <select
+                        id="contractor-routing"
+                        value={selectedRoutingId}
+                        onChange={(e) => setSelectedRoutingId(e.target.value)}
+                        className="flex-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm outline-none focus:border-[#1a6ba8] focus:ring-1 focus:ring-[#1a6ba8]/20"
+                      >
+                        {routingCats.map((c) => (
+                          <option key={c.id} value={c.id}>{c.name} — {c.email}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                )}
                 <div className="overflow-hidden rounded-lg border border-gray-300 focus-within:border-[#1a6ba8] focus-within:ring-2 focus-within:ring-[#1a6ba8]/20">
                   <textarea
                     value={reply}
@@ -509,7 +563,7 @@ export default function CaseDetailPage() {
                 Öppna ärende igen
               </button>
             </div>
-          ) : isManual ? (
+          ) : (
             <div className="pt-1">
               <button
                 type="button"
@@ -519,7 +573,7 @@ export default function CaseDetailPage() {
                 Avsluta ärende
               </button>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
 
