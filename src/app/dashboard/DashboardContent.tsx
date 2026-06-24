@@ -53,6 +53,7 @@ interface RawCase {
   property: { id: string; name: string } | null;
   fieldValues: { field: { key: string; label: string }; value: string }[];
   messages: { body: string }[];
+  extractedAddress: string | null;
 }
 
 export function DashboardContent() {
@@ -127,11 +128,7 @@ export function DashboardContent() {
     () =>
       cases
         .filter((c) => c.isReady)
-        .map((c) => {
-          const addressField = c.fieldValues.find((fv) =>
-            /adress|address/i.test(fv.field.key),
-          );
-          return {
+        .map((c) => ({
             id: c.id,
             subject: c.subject,
             residentEmail: c.residentEmail,
@@ -139,12 +136,11 @@ export function DashboardContent() {
             urgency: "LOW" as const,
             category: c.category,
             property: c.property,
-            address: addressField?.value,
+            address: c.extractedAddress ?? undefined,
             summary: c.summary ?? "AI-sammanfattning saknas för detta ärende.",
             assignee: c.category?.name ?? "—",
             reportedAt: c.updatedAt,
-          };
-        }),
+          })),
     [cases],
   );
 

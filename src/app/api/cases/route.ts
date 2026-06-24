@@ -26,11 +26,19 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         include: { field: { select: { key: true, label: true } } },
       },
       messages: {
-        orderBy: { sentAt: "desc" },
+        orderBy: { sentAt: "asc" },
         take: 1,
       },
     },
   });
 
-  return NextResponse.json(cases);
+  const result = cases.map((c) => {
+    const firstBody = c.messages[0]?.body ?? "";
+    const addrFromMsg = firstBody.match(/^Adress:\s*(.+)$/m)?.[1]?.trim() ?? null;
+    const addrFromFields =
+      c.fieldValues.find((fv) => /adress|address/i.test(fv.field.key))?.value ?? null;
+    return { ...c, extractedAddress: addrFromFields ?? addrFromMsg };
+  });
+
+  return NextResponse.json(result);
 }
