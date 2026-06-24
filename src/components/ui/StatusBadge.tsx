@@ -14,8 +14,8 @@ const CONFIG: Record<CaseStatus, { label: string; classes: string }> = {
     classes: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
   },
   ESCALATED: {
-    label: "Brådskande",
-    classes: "bg-red-50 text-red-700 ring-1 ring-red-200",
+    label: "Manuellt fall",
+    classes: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
   },
   IN_PROGRESS: {
     label: "Pågående",
