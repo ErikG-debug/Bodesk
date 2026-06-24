@@ -8,6 +8,7 @@ import { closeCase, reopenCase, useClosedCases } from "@/lib/closedCases";
 import { markManual, unmarkManual, useManualCases } from "@/lib/caseOverrides";
 import { useCaseStages, setCaseStage } from "@/lib/caseStages";
 import { useRoutingCategories } from "@/lib/categories";
+import { useContractors } from "@/lib/contractors";
 import type { CaseStatus } from "@prisma/client";
 
 type Sender = "resident" | "bo" | "handler";
@@ -77,20 +78,26 @@ export default function CaseDetailPage() {
 
 
   const routingCats = useRoutingCategories();
+  const contractors = useContractors();
   const [selectedRoutingId, setSelectedRoutingId] = useState("");
 
+  const recipients = useMemo(() => [
+    ...routingCats.map((c) => ({ id: `r:${c.id}`, label: `${c.name}`, email: c.email })),
+    ...contractors.filter((c) => c.email).map((c) => ({ id: `c:${c.id}`, label: `${c.name} — ${c.role}`, email: c.email })),
+  ], [routingCats, contractors]);
+
   useEffect(() => {
-    if (routingCats.length > 0 && !selectedRoutingId) {
-      const match = routingCats.find(
-        (c) => c.name.toLowerCase() === (caseData?.category?.name ?? "").toLowerCase(),
+    if (recipients.length > 0 && !selectedRoutingId) {
+      const match = recipients.find(
+        (r) => r.label.toLowerCase() === (caseData?.category?.name ?? "").toLowerCase(),
       );
-      setSelectedRoutingId(match?.id ?? routingCats[0]?.id ?? "");
+      setSelectedRoutingId(match?.id ?? recipients[0]?.id ?? "");
     }
-  }, [routingCats, caseData, selectedRoutingId]);
+  }, [recipients, caseData, selectedRoutingId]);
 
   const selectedRouting = useMemo(
-    () => routingCats.find((c) => c.id === selectedRoutingId) ?? routingCats[0] ?? null,
-    [routingCats, selectedRoutingId],
+    () => recipients.find((r) => r.id === selectedRoutingId) ?? recipients[0] ?? null,
+    [recipients, selectedRoutingId],
   );
 
   const fetchCase = useCallback(async () => {
@@ -351,7 +358,7 @@ export default function CaseDetailPage() {
                     <label htmlFor="contractor-routing" className="shrink-0 text-xs font-medium text-gray-500">
                       Skickas till:
                     </label>
-                    {routingCats.length === 0 ? (
+                    {recipients.length === 0 ? (
                       <span className="text-xs italic text-gray-400">Lägg till servicepersonal i Inställningar</span>
                     ) : (
                       <select
@@ -360,8 +367,8 @@ export default function CaseDetailPage() {
                         onChange={(e) => setSelectedRoutingId(e.target.value)}
                         className="flex-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm outline-none focus:border-[#1a6ba8] focus:ring-1 focus:ring-[#1a6ba8]/20"
                       >
-                        {routingCats.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name} — {c.email}</option>
+                        {recipients.map((r) => (
+                          <option key={r.id} value={r.id}>{r.label} — {r.email}</option>
                         ))}
                       </select>
                     )}
