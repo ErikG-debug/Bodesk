@@ -165,7 +165,6 @@ export async function processInboundEmail(email: InboundEmail, overrideCompanyId
       updates.categoryId = analysis.detectedCategoryId;
     }
     await prisma.case.update({ where: { id: existingCase.id }, data: updates });
-    void incomingMessage;
   }
 
   // Spara extraherade fältvärden
