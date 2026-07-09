@@ -19,13 +19,13 @@ The tenant never interacts with the platform UI. The dashboard is exclusively fo
 
 ## Live Testing
 
-The system was tested end-to-end using real email accounts:
+The system was tested end-to-end with real email accounts and worked successfully:
 
 - Forwarding rules were set up on a real Gmail account to route incoming tenant mail to Postmark
 - Postmark delivered the emails to the local webhook via ngrok
-- Claude classified issues, asked follow-up questions, and collected structured data across multi-turn email conversations
-- Replies were sent from the property manager's Gmail address via OAuth2 — appearing as normal emails in the tenant's inbox
-- The full case lifecycle (collecting → waiting → ready for review → approved → forwarded to contractor) was verified manually
+- Claude correctly classified issues, asked follow-up questions, and collected structured data across multi-turn email conversations
+- Replies arrived in the tenant's inbox from the property manager's real Gmail address via OAuth2 — with no sign of a platform involved
+- The full case lifecycle was completed successfully: collecting information → waiting for resident → ready for review → approved → forwarded to contractor
 
 ## Features
 
